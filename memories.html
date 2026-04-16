@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>午后回忆 — AfterWork</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-header {
+      padding: 120px 40px 60px;
+      text-align: center;
+    }
+
+    .page-header h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .page-header p {
+      color: var(--color-text-muted);
+    }
+
+    /* ---- Memory Feed ---- */
+    .memories-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+    }
+
+    .memories-masonry {
+      columns: 2;
+      column-gap: 20px;
+    }
+
+    .memory-item {
+      break-inside: avoid;
+      margin-bottom: 20px;
+      padding: 24px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-base);
+    }
+
+    .memory-item:hover {
+      border-color: rgba(212,168,83,0.35);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .memory-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .memory-author-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--color-bg);
+      font-weight: 600;
+    }
+
+    .memory-author-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .memory-author-name {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+    }
+
+    .memory-time {
+      font-size: 0.72rem;
+      color: var(--color-text-muted);
+      opacity: 0.6;
+    }
+
+    .memory-content {
+      font-family: var(--font-serif);
+      font-size: 0.95rem;
+      color: var(--color-text);
+      line-height: 1.9;
+    }
+
+    .memory-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .memory-drink-tag {
+      font-size: 0.75rem;
+      color: var(--color-secondary);
+    }
+
+    .memory-reactions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .reaction-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+
+    .reaction-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    /* ---- Leave Memory CTA ---- */
+    .leave-cta {
+      text-align: center;
+      margin-top: 48px;
+      padding: 40px;
+      border: 1px dashed var(--color-border);
+      border-radius: var(--radius-lg);
+    }
+
+    .leave-cta p {
+      color: var(--color-text-muted);
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .memories-masonry { columns: 1; }
+      .page-header { padding: 100px 20px 40px; }
+      .memories-container { padding: 0 20px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo">AfterWork</div>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="drinks.html">酒单</a></li>
+      <li><a href="memories.html" class="active">午后回忆</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-header">
+    <h1>午后回忆</h1>
+    <p>别人的片段，或许也是你的下午</p>
+  </div>
+
+  <div class="memories-container">
+    <div class="memories-masonry" id="memoriesMasonry"></div>
+
+    <div class="leave-cta">
+      <p>你也有话想说？来酒馆点一杯，留下一段回忆。</p>
+      <a href="drinks.html" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 22h8M7 10h10M12 15v7M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg>
+        进入酒馆，留下一段
+      </a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>AfterWork · 午后酒馆 &copy; 2026 &nbsp;|&nbsp; 仅供放松，请勿贪杯</p>
+  </footer>
+
+  <script>
+    const MEMORIES = [
+      { id: 1, author: '失眠俱乐部', text: '今天听到一个观点："焦虑的反面是具体"。比说"不要焦虑"有用多了。今天我选择具体地喝完这杯酒。', drink: '霓虹金·叹息', time: '今天 14:22' },
+      { id: 2, author: '匿名调酒师', text: '遇到一个程序员，他说代码从来不写注释，因为"注释是给不懂代码的人看的，我懂就够了"。然后他点了杯苦艾酒，说是来"消毒"。', drink: '最后一杯苦艾', time: '今天 13:55' },
+      { id: 3, author: '午后漫步者', text: '斜对面坐着一个人，全程对着电脑写东西，屏幕光映得脸惨白。但每次喝他那杯酒，表情都会软一下。酒真是个奇怪的东西。', drink: '琥珀慢拍', time: '昨天 16:45' },
+      { id: 4, author: '角落常客', text: '"你要做一个聪明人，而不是一个正确的人。"——今天在这听到的，不知道谁说的，但是记住了。', drink: '夜阑踟蹰', time: '前天 15:03' },
+      { id: 5, author: '第七杯', text: '今天试着在脑子里把"我要做什么"换成"我想体验什么"。感觉做事的心态变了，不那么累了。记录一下，喝完这杯回家。', drink: '春苔气泡', time: '昨天 11:30' },
+      { id: 6, author: '凌晨常驻', text: '死线龙舌兰这个名字太准了。喝到一半突然觉得，deadline 其实也是一种礼物——它逼迫你放下完美主义，先完成再说。', drink: '死线龙舌兰', time: '昨天 03:40' },
+      { id: 7, author: '理性乐观派', text: '朋友说：不要担心你的代码以后看不懂，要担心你现在写的东西以后能不能改。我把这句话记下来，配这杯。', drink: '除错玛格丽特', time: '今天 10:15' },
+      { id: 8, author: '沉思者', text: '喝到第三口的时候，我突然意识到：很多我以为是"天赋"的东西，其实只是"积累"。这个认知让我轻松了一点。', drink: '灵魂伏特加', time: '今天 15:40' },
+      { id: 9, author: '宇宙游客', text: '深海电鳗伏特加，确实很电。今晚想通了一个拖了三天的架构问题，思路清晰得像在冰面上滑行。推荐程序员试。', drink: '深海电鳗伏特加', time: '今天 20:10' },
+      { id: 10, author: '温柔反驳', text: '"你不需要很厉害才能开始，但你需要开始才能很厉害"——忘了在哪里看到的，今天配这杯酒，觉得格外对。', drink: '软重启嗨棒', time: '前天 14:00' },
+      { id: 11, author: '诗与代码', text: '有人问为什么程序员爱用"Hello World"。我觉得那是一种浪漫——用最简单的词，开启最大的可能性。这杯敬所有写第一行的程序员。', drink: '诗芽白', time: '昨天 19:20' },
+      { id: 12, author: '下班仪式感', text: '每天下班后在这坐30分钟，喝一杯，写两句话。感觉像是在白天和夜晚之间加了一个缓冲区。这个习惯已经坚持两个月了。', drink: '天际线朗姆', time: '今天 18:05' },
+    ];
+
+    function getInitial(name) {
+      return name ? name[0].toUpperCase() : '?';
+    }
+
+    function renderMemories() {
+      const masonry = document.getElementById('memoriesMasonry');
+      masonry.innerHTML = MEMORIES.map((m, i) => `
+        <div class="memory-item animate-fade-up" style="animation-delay:${i * 0.06}s">
+          <div class="memory-header">
+            <div class="memory-author-info">
+              <div class="memory-author-avatar">${getInitial(m.author)}</div>
+              <span class="memory-author-name">${m.author}</span>
+            </div>
+            <span class="memory-time">${m.time}</span>
+          </div>
+          <p class="memory-content">"${m.text}"</p>
+          <div class="memory-footer">
+            <span class="memory-drink-tag">🍸 ${m.drink}</span>
+            <div class="memory-reactions">
+              <button class="reaction-btn">💡 有同感</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderMemories();
+  </script>
+</body>
+</html>
