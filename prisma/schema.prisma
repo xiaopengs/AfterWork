@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Drink {
+  id          String   @id @default(cuid())
+  name        String
+  nameEn      String?
+  description String?
+  abv         Float?
+  image       String?
+  tags        String   @default("[]")
+  rating      Float    @default(0)
+  createdAt   DateTime @default(now())
+  memories    Memory[]
+}
+
+model Memory {
+  id        String   @id @default(cuid())
+  content   String
+  mood      String?
+  drinkId   String?
+  drink     Drink?   @relation(fields: [drinkId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+}

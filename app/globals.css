@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0D0D0D;
+  --bg-primary-light: #1A1A1A;
+  --bg-secondary: #252525;
+  --accent-wine: #8B2942;
+  --accent-wine-light: #A33D56;
+  --accent-gold: #D4A574;
+  --accent-gold-light: #E8C9A4;
+  --text-primary: #F5F5F5;
+  --text-secondary: #A0A0A0;
+  --neon-pink: #FF6B9D;
+  --neon-blue: #4ECDC4;
+  --neon-purple: #9B59B6;
+  --shadow-wine: rgba(139, 41, 66, 0.4);
+  --shadow-gold: rgba(212, 165, 116, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-wine);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-wine-light);
+}
+
+/* Neon glow effect */
+.neon-glow {
+  text-shadow: 
+    0 0 5px var(--accent-wine),
+    0 0 10px var(--accent-wine),
+    0 0 20px var(--accent-wine),
+    0 0 40px var(--accent-wine);
+}
+
+.neon-glow-gold {
+  text-shadow: 
+    0 0 5px var(--accent-gold),
+    0 0 10px var(--accent-gold),
+    0 0 20px var(--accent-gold);
+}
+
+/* Glass morphism effect */
+.glass-effect {
+  background: rgba(26, 26, 26, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Animated gradient background */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-gradient {
+  background: linear-gradient(
+    270deg,
+    var(--bg-primary),
+    var(--bg-secondary),
+    #1f1a1a,
+    var(--bg-primary)
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Pulse glow animation */
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px var(--accent-wine), 0 0 10px var(--accent-wine);
+  }
+  50% { 
+    box-shadow: 0 0 20px var(--accent-wine), 0 0 30px var(--accent-wine), 0 0 40px var(--accent-wine);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect for loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(212, 165, 116, 0.3) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Wine pour animation */
+@keyframes wine-pour {
+  0% { 
+    height: 0%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% { 
+    height: 70%;
+    opacity: 1;
+  }
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--accent-wine);
+  color: var(--text-primary);
+}
+
+/* Focus styling */
+:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
