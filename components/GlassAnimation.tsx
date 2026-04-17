@@ -15,14 +15,19 @@ export default function GlassAnimation({
   const [pourProgress, setPourProgress] = useState(0);
 
   const sizeClasses = {
-    sm: { glass: "w-12 h-16", stem: "h-6 bottom-[-24px]", base: "w-6 bottom-[-4px]" },
-    md: { glass: "w-20 h-28", stem: "h-10 bottom-[-40px]", base: "w-10 bottom-[-8px]" },
-    lg: { glass: "w-32 h-44", stem: "h-16 bottom-[-64px]", base: "w-16 bottom-[-12px]" },
+    sm: { glass: "w-10 h-14 sm:w-12 sm:h-16", stem: "h-5 sm:h-6 bottom-[-20px] sm:bottom-[-24px]", base: "w-5 sm:w-6 bottom-[-3px] sm:bottom-[-4px]" },
+    md: { glass: "w-16 h-22 sm:w-20 sm:h-28", stem: "h-8 sm:h-10 bottom-[-32px] sm:bottom-[-40px]", base: "w-8 sm:w-10 bottom-[-6px] sm:bottom-[-8px]" },
+    lg: { glass: "w-24 h-36 sm:w-32 sm:h-44", stem: "h-12 sm:h-16 bottom-[-48px] sm:bottom-[-64px]", base: "w-12 sm:w-16 bottom-[-10px] sm:bottom-[-12px]" },
   };
 
   const currentSize = sizeClasses[size];
 
   useEffect(() => {
+    // Faster animation on mobile
+    const isMobile = window.innerWidth < 768;
+    const intervalTime = isMobile ? 30 : 50;
+    const increment = isMobile ? 3 : 2;
+    
     const interval = setInterval(() => {
       setPourProgress((prev) => {
         if (prev >= 100) {
@@ -30,15 +35,15 @@ export default function GlassAnimation({
           clearInterval(interval);
           return 100;
         }
-        return prev + 2;
+        return prev + increment;
       });
-    }, 50);
+    }, intervalTime);
 
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center">
+    <div className="relative flex flex-col items-center px-4">
       {/* Bottle being poured */}
       <div 
         className={`${currentSize.glass} rounded-t-full relative`}
@@ -46,27 +51,29 @@ export default function GlassAnimation({
           background: `linear-gradient(180deg, ${color} 0%, ${color}88 100%)`,
           transform: "rotate(-45deg)",
           transformOrigin: "bottom center",
-          boxShadow: `0 0 30px ${color}60`,
+          boxShadow: `0 0 20px ${color}60`,
+          willChange: "transform, box-shadow",
         }}
       >
-        <div className="absolute top-4 left-4 w-3 h-10 rounded-full opacity-40"
+        <div className="absolute top-3 sm:top-4 left-3 sm:left-4 w-2 sm:w-3 h-8 sm:h-10 rounded-full opacity-40"
           style={{ backgroundColor: "rgba(255,255,255,0.6)" }}
         />
       </div>
 
-      {/* Pour stream */}
+      {/* Pour stream - simplified for mobile */}
       {isPouring && (
         <div 
-          className="w-2 h-8 rounded-full animate-pulse"
+          className="w-1.5 sm:w-2 h-6 sm:h-8 rounded-full"
           style={{ 
             backgroundColor: color,
             boxShadow: `0 0 10px ${color}`,
+            opacity: 0.8,
           }}
         />
       )}
 
       {/* Wine glass */}
-      <div className="relative mt-8">
+      <div className="relative mt-6 sm:mt-8">
         {/* Glass body */}
         <div 
           className={`${currentSize.glass} rounded-t-full relative overflow-hidden`}
@@ -77,23 +84,23 @@ export default function GlassAnimation({
         >
           {/* Wine fill */}
           <div 
-            className="absolute bottom-0 left-0 right-0 transition-all duration-200"
+            className="absolute bottom-0 left-0 right-0 transition-all duration-100"
             style={{ 
               height: `${pourProgress}%`,
               background: `linear-gradient(180deg, ${color}CC 0%, ${color} 100%)`,
-              boxShadow: `inset 0 0 20px ${color}80`,
+              boxShadow: `inset 0 0 15px ${color}80`,
             }}
           >
-            {/* Bubbles */}
-            <div className="absolute inset-0 overflow-hidden">
+            {/* Bubbles - reduced on mobile */}
+            <div className="absolute inset-0 overflow-hidden hidden sm:block">
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="absolute w-1 h-1 rounded-full bg-white/30 animate-bounce"
+                  className="absolute w-1 h-1 rounded-full bg-white/30"
                   style={{
                     left: `${20 + i * 15}%`,
-                    animationDelay: `${i * 0.3}s`,
-                    animationDuration: `${1.5 + i * 0.2}s`,
+                    animation: `float 2s ease-in-out infinite`,
+                    animationDelay: `${i * 0.4}s`,
                   }}
                 />
               ))}
@@ -102,7 +109,7 @@ export default function GlassAnimation({
 
           {/* Glass shine */}
           <div 
-            className="absolute top-2 left-3 w-2 h-8 rounded-full opacity-30"
+            className="absolute top-1.5 sm:top-2 left-2 sm:left-3 w-1.5 sm:w-2 h-6 sm:h-8 rounded-full opacity-30"
             style={{ backgroundColor: "rgba(255,255,255,0.5)" }}
           />
         </div>
@@ -111,7 +118,7 @@ export default function GlassAnimation({
         <div 
           className={`absolute ${currentSize.stem} left-1/2 -translate-x-1/2 rounded-full`}
           style={{ 
-            width: "8px",
+            width: "6px sm:8px",
             background: "linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%)",
           }}
         />
@@ -126,13 +133,13 @@ export default function GlassAnimation({
 
         {/* Glow effect under glass */}
         <div 
-          className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-24 h-8 rounded-full blur-xl opacity-50"
+          className="absolute -bottom-1.5 sm:-bottom-2 left-1/2 -translate-x-1/2 w-20 sm:w-24 h-6 sm:h-8 rounded-full blur-lg opacity-50"
           style={{ backgroundColor: color }}
         />
       </div>
 
       {/* Status text */}
-      <p className="mt-8 text-text-secondary text-sm">
+      <p className="mt-6 sm:mt-8 text-text-secondary text-xs sm:text-sm">
         {pourProgress < 100 ? "正在斟酒..." : "酒已斟好，享用吧"}
       </p>
     </div>

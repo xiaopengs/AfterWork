@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import GlassAnimation from "@/components/GlassAnimation";
 
 const wines = [
@@ -49,7 +50,7 @@ const wines = [
 export default function BarPage() {
   const [selectedWine, setSelectedWine] = useState(wines[0]);
   const [tastingStep, setTastingStep] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(true);
+  const [showWineList, setShowWineList] = useState(false);
 
   const tastingSteps = [
     { title: "观色", desc: "将酒杯倾斜45度，观察酒液的色泽和透明度" },
@@ -59,69 +60,74 @@ export default function BarPage() {
   ];
 
   const handleNextStep = () => {
-    if (tastingStep < tastingSteps.length - 1) {
-      setTastingStep(tastingStep + 1);
-    } else {
-      setTastingStep(0);
-    }
-    setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 2000);
+    setTastingStep((prev) => (prev < tastingSteps.length - 1 ? prev + 1 : 0));
   };
 
   return (
-    <div className="min-h-screen py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <span className="text-accent-gold text-sm tracking-wider">TASTING ROOM</span>
-          <h1 className="text-4xl md:text-5xl font-serif text-text-primary mt-2 mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <span className="text-accent-gold text-xs sm:text-sm tracking-wider">TASTING ROOM</span>
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif text-text-primary mt-2 mb-3 sm:mb-4">
             私享品酒间
           </h1>
-          <p className="text-text-secondary max-w-2xl mx-auto">
+          <p className="text-text-secondary max-w-2xl mx-auto text-sm sm:text-base px-4">
             选一款心仪的酒，跟随导引，慢慢品味其中的韵味与故事
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Left: Wine selection */}
-          <div>
+        {/* Mobile wine toggle */}
+        <button
+          onClick={() => setShowWineList(!showWineList)}
+          className="md:hidden w-full mb-4 p-3 glass-effect rounded-xl flex items-center justify-between active:scale-[0.98]"
+        >
+          <span className="text-text-primary text-sm">选择酒款: <strong>{selectedWine.name}</strong></span>
+          <span className="text-text-secondary">{showWineList ? "▲" : "▼"}</span>
+        </button>
+
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-12">
+          {/* Left: Wine selection - hidden on mobile unless toggled */}
+          <div className={`${showWineList ? 'block' : 'hidden md:block'}`}>
             {/* Wine list */}
-            <div className="space-y-4">
+            <div className="space-y-2 sm:space-y-4">
               {wines.map((wine) => (
                 <button
                   key={wine.id}
                   onClick={() => {
                     setSelectedWine(wine);
                     setTastingStep(0);
+                    setShowWineList(false);
                   }}
-                  className={`w-full p-6 rounded-xl text-left transition-all duration-300 ${
+                  className={`w-full p-3 sm:p-6 rounded-xl text-left transition-all duration-200 touch-manipulation select-none active:scale-[0.98] ${
                     selectedWine.id === wine.id
                       ? "glass-effect border-accent-wine"
                       : "bg-primary-light/50 hover:bg-primary-light"
                   }`}
+                  style={{ willChange: 'transform' }}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     <div 
-                      className="w-16 h-20 rounded-lg"
+                      className="w-12 h-16 sm:w-16 sm:h-20 rounded-lg flex-shrink-0"
                       style={{
                         background: selectedWine.id === wine.id 
                           ? "linear-gradient(135deg, #8B2942 0%, #A33D56 100%)"
                           : "linear-gradient(135deg, #1A1A1A 0%, #252525 100%)",
                         boxShadow: selectedWine.id === wine.id 
-                          ? "0 0 20px rgba(139, 41, 66, 0.4)" 
+                          ? "0 0 15px rgba(139, 41, 66, 0.4)" 
                           : "none",
                       }}
                     />
-                    <div className="flex-1">
-                      <h3 className="text-lg font-serif text-text-primary">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm sm:text-lg font-serif text-text-primary truncate">
                         {wine.name}
                       </h3>
-                      <p className="text-text-secondary text-sm">
+                      <p className="text-text-secondary text-xs sm:text-sm truncate">
                         {wine.region} · {wine.grape} · {wine.vintage}
                       </p>
                     </div>
                     {selectedWine.id === wine.id && (
-                      <span className="text-accent-wine text-2xl">✓</span>
+                      <span className="text-accent-wine text-lg sm:text-2xl flex-shrink-0">✓</span>
                     )}
                   </div>
                 </button>
@@ -129,21 +135,21 @@ export default function BarPage() {
             </div>
 
             {/* Selected wine details */}
-            <div className="mt-8 p-6 glass-effect rounded-xl">
-              <h3 className="text-2xl font-serif text-text-primary mb-4">
+            <div className="mt-4 sm:mt-8 p-4 sm:p-6 glass-effect rounded-xl">
+              <h3 className="text-lg sm:text-2xl font-serif text-text-primary mb-2 sm:mb-4">
                 {selectedWine.name}
               </h3>
-              <p className="text-text-secondary leading-relaxed mb-6">
+              <p className="text-text-secondary leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
                 {selectedWine.description}
               </p>
               
-              <div className="mb-6">
-                <h4 className="text-accent-gold text-sm mb-3">风味特征</h4>
-                <div className="flex flex-wrap gap-2">
+              <div className="mb-4 sm:mb-6">
+                <h4 className="text-accent-gold text-xs sm:text-sm mb-2 sm:mb-3">风味特征</h4>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {selectedWine.flavor.map((f, i) => (
                     <span 
                       key={i}
-                      className="px-3 py-1 bg-accent-wine/20 rounded-full text-sm text-text-primary"
+                      className="px-2 sm:px-3 py-0.5 sm:py-1 bg-accent-wine/20 rounded-full text-xs sm:text-sm text-text-primary"
                     >
                       {f}
                     </span>
@@ -152,30 +158,30 @@ export default function BarPage() {
               </div>
 
               <div>
-                <h4 className="text-accent-gold text-sm mb-2">餐酒搭配</h4>
-                <p className="text-text-secondary text-sm">{selectedWine.pairing}</p>
+                <h4 className="text-accent-gold text-xs sm:text-sm mb-1 sm:mb-2">餐酒搭配</h4>
+                <p className="text-text-secondary text-xs sm:text-sm">{selectedWine.pairing}</p>
               </div>
             </div>
           </div>
 
           {/* Right: Tasting experience */}
           <div>
-            <div className="sticky top-24">
+            <div className="lg:sticky lg:top-24">
               {/* Glass animation */}
-              <div className="glass-effect rounded-2xl p-8 mb-8">
-                <div className="flex justify-center mb-6">
+              <div className="glass-effect rounded-2xl p-4 sm:p-8 mb-4 sm:mb-8">
+                <div className="flex justify-center mb-4 sm:mb-6">
                   <GlassAnimation 
                     color="#8B2942" 
-                    size="lg"
+                    size="md"
                   />
                 </div>
                 
                 {/* Tasting progress */}
-                <div className="flex justify-center gap-2 mb-6">
+                <div className="flex justify-center gap-2 mb-4 sm:mb-6">
                   {tastingSteps.map((_, i) => (
                     <div
                       key={i}
-                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      className={`w-2 sm:w-3 h-2 sm:h-3 rounded-full transition-all duration-300 ${
                         i <= tastingStep ? "bg-accent-wine" : "bg-text-secondary/30"
                       }`}
                     />
@@ -184,25 +190,25 @@ export default function BarPage() {
               </div>
 
               {/* Tasting guide */}
-              <div className="glass-effect rounded-xl p-6">
-                <h4 className="text-xl font-serif text-text-primary mb-2">
+              <div className="glass-effect rounded-xl p-4 sm:p-6">
+                <h4 className="text-lg sm:text-xl font-serif text-text-primary mb-2">
                   {tastingSteps[tastingStep].title}
                 </h4>
-                <p className="text-text-secondary leading-relaxed mb-6">
+                <p className="text-text-secondary leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
                   {tastingSteps[tastingStep].desc}
                 </p>
 
                 <button
                   onClick={handleNextStep}
-                  className="w-full py-3 bg-accent-wine text-text-primary rounded-lg font-medium transition-all duration-300 hover:bg-accent-wine-light hover:scale-[1.02]"
+                  className="w-full py-2.5 sm:py-3 bg-accent-wine text-text-primary rounded-lg font-medium transition-all duration-200 active:scale-95 touch-manipulation text-sm sm:text-base"
                 >
                   {tastingStep < tastingSteps.length - 1 ? "下一步 →" : "重新开始 ↺"}
                 </button>
               </div>
 
               {/* Tips */}
-              <div className="mt-6 p-4 bg-accent-gold/10 rounded-lg border border-accent-gold/20">
-                <p className="text-accent-gold text-sm">
+              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-accent-gold/10 rounded-lg border border-accent-gold/20">
+                <p className="text-accent-gold text-xs sm:text-sm">
                   💡 小贴士：品酒时保持环境光线充足，温度适宜（红酒16-18°C，白酒8-12°C），更能体验到酒的完整风味。
                 </p>
               </div>
@@ -212,28 +218,38 @@ export default function BarPage() {
 
         {/* Bottom section: Wine knowledge */}
         <div className="mt-20">
+          {/* Game Hint - 克制入口 */}
+          <div className="text-center mb-8">
+            <button 
+              onClick={() => alert('🎲 骰子在手边，想玩随时招呼~')}
+              className="text-text-secondary/60 text-xs hover:text-text-secondary transition-colors"
+            >
+              🎲 酒令骰子在手边
+            </button>
+          </div>
+
           <h2 className="text-2xl font-serif text-text-primary text-center mb-8">
             品酒小知识
           </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="glass-effect rounded-xl p-6 text-center">
-              <span className="text-4xl mb-4 block">👁️</span>
-              <h3 className="text-lg font-serif text-text-primary mb-2">观色</h3>
-              <p className="text-text-secondary text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="glass-effect rounded-xl p-4 sm:p-6 text-center">
+              <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">👁️</span>
+              <h3 className="text-base sm:text-lg font-serif text-text-primary mb-1 sm:mb-2">观色</h3>
+              <p className="text-text-secondary text-xs sm:text-sm">
                 倾斜酒杯观察酒液的边缘颜色，红酒从紫红到砖红，白酒从青柠色到金黄。
               </p>
             </div>
-            <div className="glass-effect rounded-xl p-6 text-center">
-              <span className="text-4xl mb-4 block">👃</span>
-              <h3 className="text-lg font-serif text-text-primary mb-2">闻香</h3>
-              <p className="text-text-secondary text-sm">
+            <div className="glass-effect rounded-xl p-4 sm:p-6 text-center">
+              <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">👃</span>
+              <h3 className="text-base sm:text-lg font-serif text-text-primary mb-1 sm:mb-2">闻香</h3>
+              <p className="text-text-secondary text-xs sm:text-sm">
                 先闻静止的香气，再轻轻摇晃让香气释放，感受一层层展开的风味层次。
               </p>
             </div>
-            <div className="glass-effect rounded-xl p-6 text-center">
-              <span className="text-4xl mb-4 block">👅</span>
-              <h3 className="text-lg font-serif text-text-primary mb-2">品味</h3>
-              <p className="text-text-secondary text-sm">
+            <div className="glass-effect rounded-xl p-4 sm:p-6 text-center sm:col-span-2 md:col-span-1">
+              <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">👅</span>
+              <h3 className="text-base sm:text-lg font-serif text-text-primary mb-1 sm:mb-2">品味</h3>
+              <p className="text-text-secondary text-xs sm:text-sm">
                 小口品尝，让酒液充分接触口腔各处，注意甜、酸、单宁和酒体的平衡。
               </p>
             </div>

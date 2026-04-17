@@ -6,6 +6,8 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  // Mobile-first dark theme
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -22,7 +24,7 @@ const config: Config = {
       },
       fontFamily: {
         serif: ["Georgia", "Cambria", "Times New Roman", "Times", "serif"],
-        sans: ["system-ui", "-apple-system", "sans-serif"],
+        sans: ["system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
       },
       animation: {
         "glow-pulse": "glow-pulse 2s ease-in-out infinite",
@@ -43,8 +45,37 @@ const config: Config = {
           "100%": { backgroundPosition: "200% 0" },
         },
       },
+      // Mobile optimizations
+      screens: {
+        "xs": "375px",
+        "sm": "640px",
+        "md": "768px",
+        "lg": "1024px",
+        "xl": "1280px",
+      },
+      spacing: {
+        "safe-top": "env(safe-area-inset-top)",
+        "safe-bottom": "env(safe-area-inset-bottom)",
+      },
     },
   },
   plugins: [],
+  // Safelist for mobile-optimized utility classes
+  safelist: [
+    // Mobile touch feedback classes
+    "active:scale-95",
+    "active:opacity-80",
+    "touch-pan-y",
+    "touch-pan-x",
+    // Dark theme classes
+    "dark",
+    "dark:bg-primary",
+    "dark:text-text-primary",
+    // Animation reduced motion
+    "motion-reduce:transition-none",
+    "motion-reduce:transform-none",
+    "motion-reduce:animate-none",
+  ],
 };
+
 export default config;

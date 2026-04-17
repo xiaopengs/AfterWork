@@ -110,7 +110,7 @@ export default function MemoriesPage() {
     }
   };
 
-  // 合并默认回忆和用户回忆
+  // Merge default and user memories
   const allMemories = [
     ...defaultMemories.map((m) => ({ ...m, isUser: false })),
     ...userMemories.map((m) => ({
@@ -132,40 +132,40 @@ export default function MemoriesPage() {
       : allMemories.filter((m) => m.mood === filter);
 
   return (
-    <div className="min-h-screen py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <span className="text-accent-gold text-sm tracking-wider">MEMORIES</span>
-          <h1 className="text-4xl md:text-5xl font-serif text-text-primary mt-2 mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <span className="text-accent-gold text-xs sm:text-sm tracking-wider">MEMORIES</span>
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-serif text-text-primary mt-2 mb-3 sm:mb-4">
             午后回忆墙
           </h1>
-          <p className="text-text-secondary max-w-2xl mx-auto">
+          <p className="text-text-secondary max-w-2xl mx-auto text-sm sm:text-base">
             每一杯酒背后，都有一个故事。
-            <br />
+            <br className="hidden sm:block" />
             这里是酒客们留下的珍贵回忆，温暖而动人。
           </p>
         </div>
 
         {/* Decorative quote */}
-        <div className="text-center mb-12">
-          <blockquote className="text-xl font-serif text-accent-gold italic">
+        <div className="text-center mb-8 sm:mb-12 px-4">
+          <blockquote className="text-base sm:text-xl font-serif text-accent-gold italic">
             &ldquo;有些地方，存放着时光的温度；
             <br />
             有些味道，承载着记忆的重量。&rdquo;
           </blockquote>
         </div>
 
-        {/* Filter */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
+        {/* Filter - horizontal scroll on mobile */}
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 overflow-x-auto pb-2">
           {moods.map((mood) => (
             <button
               key={mood}
               onClick={() => setFilter(mood)}
-              className={`px-5 py-2 rounded-full text-sm transition-all duration-300 ${
+              className={`px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm transition-all duration-200 touch-manipulation select-none whitespace-nowrap active:scale-95 ${
                 filter === mood
-                  ? "bg-accent-wine text-text-primary scale-105"
-                  : "bg-primary-light text-text-secondary hover:text-text-primary hover:bg-primary-light/80"
+                  ? "bg-accent-wine text-text-primary"
+                  : "bg-primary-light text-text-secondary hover:text-text-primary"
               }`}
             >
               {mood}
@@ -175,11 +175,11 @@ export default function MemoriesPage() {
 
         {/* User memories section (logged in) */}
         {isLoggedIn && userMemories.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-xl font-serif text-accent-gold mb-4 text-center">
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-lg sm:text-xl font-serif text-accent-gold mb-3 sm:mb-4 text-center">
               📝 我的回忆
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {userMemories.map((memory) => (
                 <MemoryCard
                   key={memory.id}
@@ -198,7 +198,7 @@ export default function MemoriesPage() {
         )}
 
         {/* Public memories */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredMemories.map((memory) => (
             <MemoryCard
               key={memory.id}
@@ -209,59 +209,59 @@ export default function MemoriesPage() {
 
         {/* Empty state */}
         {filteredMemories.length === 0 && (
-          <div className="text-center py-20">
-            <span className="text-6xl mb-4 block">📭</span>
+          <div className="text-center py-16 sm:py-20">
+            <span className="text-5xl sm:text-6xl mb-3 sm:mb-4 block">📭</span>
             <p className="text-text-secondary">暂无符合条件的回忆</p>
           </div>
         )}
 
         {/* Stats section */}
-        <div className="mt-20 glass-effect rounded-2xl p-8">
-          <h2 className="text-2xl font-serif text-text-primary text-center mb-8">
+        <div className="mt-12 sm:mt-20 glass-effect rounded-xl sm:rounded-2xl p-4 sm:p-8">
+          <h2 className="text-lg sm:text-2xl font-serif text-text-primary text-center mb-4 sm:mb-8">
             回忆墙数据
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 text-center">
             <div>
-              <p className="text-4xl font-serif text-accent-gold mb-2">{allMemories.length}</p>
-              <p className="text-text-secondary text-sm">温暖故事</p>
+              <p className="text-3xl sm:text-4xl font-serif text-accent-gold mb-1 sm:mb-2">{allMemories.length}</p>
+              <p className="text-text-secondary text-xs sm:text-sm">温暖故事</p>
             </div>
             <div>
-              <p className="text-4xl font-serif text-accent-wine mb-2">8</p>
-              <p className="text-text-secondary text-sm">涉及酒款</p>
+              <p className="text-3xl sm:text-4xl font-serif text-accent-wine mb-1 sm:mb-2">8</p>
+              <p className="text-text-secondary text-xs sm:text-sm">涉及酒款</p>
             </div>
             <div>
-              <p className="text-4xl font-serif text-neon-pink mb-2">6</p>
-              <p className="text-text-secondary text-sm">心情标签</p>
+              <p className="text-3xl sm:text-4xl font-serif text-neon-pink mb-1 sm:mb-2">6</p>
+              <p className="text-text-secondary text-xs sm:text-sm">心情标签</p>
             </div>
             <div>
-              <p className="text-4xl font-serif text-neon-cyan mb-2">∞</p>
-              <p className="text-text-secondary text-sm">未完待续</p>
+              <p className="text-3xl sm:text-4xl font-serif text-neon-blue mb-1 sm:mb-2">∞</p>
+              <p className="text-text-secondary text-xs sm:text-sm">未完待续</p>
             </div>
           </div>
         </div>
 
         {/* Leave memory CTA */}
-        <div className="mt-12 text-center">
-          <div className="glass-effect rounded-xl p-8 max-w-lg mx-auto">
-            <span className="text-4xl mb-4 block">✍️</span>
-            <h3 className="text-xl font-serif text-text-primary mb-3">
+        <div className="mt-8 sm:mt-12 text-center">
+          <div className="glass-effect rounded-xl p-5 sm:p-8 max-w-lg mx-auto">
+            <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">✍️</span>
+            <h3 className="text-base sm:text-xl font-serif text-text-primary mb-2 sm:mb-3">
               分享你的故事
             </h3>
-            <p className="text-text-secondary text-sm mb-6">
+            <p className="text-text-secondary text-xs sm:text-sm mb-4 sm:mb-6">
               每一次品酒，都是一段独特的故事。欢迎来到这里，
               留下属于你的回忆。
             </p>
             {isLoggedIn ? (
               <button
                 onClick={() => setShowForm(!showForm)}
-                className="px-6 py-3 bg-accent-wine text-text-primary rounded-lg font-medium transition-all duration-300 hover:bg-accent-wine-light"
+                className="px-5 sm:px-6 py-2 sm:py-3 bg-accent-wine text-text-primary rounded-lg font-medium transition-all duration-200 active:scale-95 touch-manipulation text-sm sm:text-base"
               >
                 {showForm ? "取消" : "记录此刻"}
               </button>
             ) : (
               <Link
                 href="/login"
-                className="inline-block px-6 py-3 bg-accent-wine text-text-primary rounded-lg font-medium transition-all duration-300 hover:bg-accent-wine-light"
+                className="inline-block px-5 sm:px-6 py-2 sm:py-3 bg-accent-wine text-text-primary rounded-lg font-medium transition-all duration-200 active:scale-95 touch-manipulation text-sm sm:text-base"
               >
                 登录后记录
               </Link>
@@ -272,16 +272,16 @@ export default function MemoriesPage() {
           {showForm && (
             <form
               onSubmit={handleSubmitMemory}
-              className="mt-6 glass-effect rounded-xl p-6 max-w-lg mx-auto text-left"
+              className="mt-4 sm:mt-6 glass-effect rounded-xl p-4 sm:p-6 max-w-lg mx-auto text-left"
             >
-              <div className="mb-4">
-                <label className="block text-text-secondary text-sm mb-2">
+              <div className="mb-3 sm:mb-4">
+                <label className="block text-text-secondary text-xs sm:text-sm mb-1 sm:mb-2">
                   心情
                 </label>
                 <select
                   value={newMood}
                   onChange={(e) => setNewMood(e.target.value)}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-text-primary"
+                  className="w-full px-3 sm:px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-text-primary text-sm"
                 >
                   {moods.slice(1).map((m) => (
                     <option key={m} value={m}>
@@ -290,14 +290,14 @@ export default function MemoriesPage() {
                   ))}
                 </select>
               </div>
-              <div className="mb-4">
-                <label className="block text-text-secondary text-sm mb-2">
+              <div className="mb-3 sm:mb-4">
+                <label className="block text-text-secondary text-xs sm:text-sm mb-1 sm:mb-2">
                   记录这一刻
                 </label>
                 <textarea
                   value={newContent}
                   onChange={(e) => setNewContent(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-text-primary h-32 resize-none"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/5 border border-white/10 rounded-lg text-text-primary h-24 sm:h-32 resize-none text-sm"
                   placeholder="写下你的故事..."
                   required
                 />
@@ -305,17 +305,12 @@ export default function MemoriesPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-accent-wine text-text-primary rounded-lg font-medium transition-all hover:bg-accent-wine-light disabled:opacity-50"
+                className="w-full py-2 sm:py-3 bg-accent-wine text-text-primary rounded-lg font-medium transition-all active:scale-95 touch-manipulation disabled:opacity-50 text-sm sm:text-base"
               >
                 {loading ? "保存中..." : "保存回忆"}
               </button>
             </form>
           )}
-        </div>
-
-        {/* Floating decoration */}
-        <div className="fixed bottom-8 right-8 opacity-20 pointer-events-none">
-          <span className="text-6xl float-animation">🍷</span>
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ model User {
   password  String
   createdAt DateTime  @default(now())
   memories  Memory[]
+  posts     Post[]
 }
 
 model Drink {
@@ -43,5 +44,17 @@ model ChatMessage {
   id        String   @id @default(cuid())
   role      String
   content   String
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  content   String
+  mood      String   @default("深思")
+  likes     Int      @default(0)
+  comments  Int      @default(0)
+  anonymous Boolean  @default(true)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 }

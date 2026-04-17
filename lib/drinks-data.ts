@@ -230,6 +230,18 @@ export const drinks: Drink[] = [
   },
 ];
 
+export const moodEmojis: Record<string, string> = {
+  '温暖': '🔥',
+  '深思': '🌙',
+  '俏皮': '🌸',
+  '荒诞': '🎭',
+  '裂隙': '⚡',
+  '分裂': '🪞',
+  '脆弱': '💔',
+  '猎奇': '🦑',
+  '苦甜': '🍊',
+};
+
 export const moodColors: Record<string, string> = {
   '温暖': '#D4A574',
   '深思': '#8B5CF6',

@@ -34,37 +34,44 @@ export default function MemoryCard({
 
   const moodColor = moodColors[mood] || color;
 
+  const handleClick = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <div 
-      className="relative group"
-      style={{
-        animation: `float ${3 + Math.random() * 2}s ease-in-out infinite`,
-        animationDelay: `${Math.random() * 2}s`,
-      }}
+      className="relative touch-manipulation"
     >
       {/* Card */}
       <div 
-        className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:z-10"
+        className="relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98]"
         style={{
           background: "linear-gradient(145deg, #1A1A1A 0%, #252525 100%)",
           border: `1px solid ${moodColor}30`,
-          boxShadow: `0 4px 20px ${moodColor}20`,
+          boxShadow: `0 2px 12px ${moodColor}15`,
+          willChange: 'transform',
         }}
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={handleClick}
+        onTouchStart={(e) => e.currentTarget.style.opacity = '0.9'}
+        onTouchEnd={(e) => e.currentTarget.style.opacity = '1'}
+        role="button"
+        aria-expanded={isExpanded}
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && handleClick()}
       >
         {/* Top decorative bar */}
         <div 
-          className="h-1"
+          className="h-0.5 sm:h-1"
           style={{ background: `linear-gradient(90deg, ${moodColor}, ${moodColor}00)` }}
         />
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Header */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <span className="text-3xl">{emoji}</span>
-              <div>
-                <h3 className="text-lg font-serif text-text-primary">
+          <div className="flex items-start justify-between mb-3 sm:mb-4 gap-2">
+            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+              <span className="text-2xl sm:text-3xl flex-shrink-0">{emoji}</span>
+              <div className="min-w-0">
+                <h3 className="text-sm sm:text-lg font-serif text-text-primary truncate">
                   {title}
                 </h3>
                 <p className="text-xs text-text-secondary">{date}</p>
@@ -72,7 +79,7 @@ export default function MemoryCard({
             </div>
             
             <span 
-              className="px-3 py-1 rounded-full text-xs"
+              className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs flex-shrink-0"
               style={{ 
                 backgroundColor: `${moodColor}20`,
                 color: moodColor,
@@ -85,8 +92,8 @@ export default function MemoryCard({
 
           {/* Content */}
           <p 
-            className={`text-text-secondary text-sm leading-relaxed transition-all duration-300 ${
-              isExpanded ? "" : "line-clamp-2"
+            className={`text-text-secondary text-xs sm:text-sm leading-relaxed transition-all duration-200 ${
+              isExpanded ? "" : "line-clamp-2 sm:line-clamp-3"
             }`}
           >
             {content}
@@ -94,36 +101,28 @@ export default function MemoryCard({
 
           {/* Wine tag */}
           {wine && (
-            <div className="mt-4 flex items-center space-x-2">
-              <span className="text-accent-gold">🍷</span>
-              <span className="text-accent-gold/80 text-sm">{wine}</span>
+            <div className="mt-3 sm:mt-4 flex items-center space-x-2">
+              <span className="text-accent-gold text-sm sm:text-base">🍷</span>
+              <span className="text-accent-gold/80 text-xs sm:text-sm truncate">{wine}</span>
             </div>
           )}
 
           {/* Expand indicator */}
-          <div className="mt-4 text-center">
+          <div className="mt-3 sm:mt-4 text-center">
             <span className="text-text-secondary/50 text-xs">
               {isExpanded ? "点击收起 ↑" : "点击展开 ↓"}
             </span>
           </div>
         </div>
-
-        {/* Glow effect on hover */}
-        <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-          style={{
-            background: `radial-gradient(circle at 50% 0%, ${moodColor}20 0%, transparent 60%)`,
-          }}
-        />
       </div>
 
       {/* Decorative corner elements */}
       <div 
-        className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 rounded-tr-lg opacity-30"
+        className="absolute -top-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 border-t border-r rounded-tr opacity-30"
         style={{ borderColor: moodColor }}
       />
       <div 
-        className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 rounded-bl-lg opacity-30"
+        className="absolute -bottom-0.5 -left-0.5 w-3 h-3 sm:w-4 sm:h-4 border-b border-l rounded-bl opacity-30"
         style={{ borderColor: moodColor }}
       />
     </div>

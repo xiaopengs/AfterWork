@@ -23,6 +23,7 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -30,6 +31,8 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -37,11 +40,37 @@ body {
   color: var(--text-primary);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.6;
+  /* Mobile font sizes */
+  font-size: 16px;
+}
+
+/* Mobile scroll optimization */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  -moz-overflow-scrolling: touch;
+  -ms-overflow-scrolling: touch;
+  overflow-scrolling: touch;
+}
+
+/* Smooth scrolling with reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -57,6 +86,13 @@ body {
   background: var(--accent-wine-light);
 }
 
+/* Touch-friendly scrollbar for mobile */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+}
+
 /* Neon glow effect */
 .neon-glow {
   text-shadow: 
@@ -64,6 +100,7 @@ body {
     0 0 10px var(--accent-wine),
     0 0 20px var(--accent-wine),
     0 0 40px var(--accent-wine);
+  will-change: text-shadow;
 }
 
 .neon-glow-gold {
@@ -71,22 +108,19 @@ body {
     0 0 5px var(--accent-gold),
     0 0 10px var(--accent-gold),
     0 0 20px var(--accent-gold);
+  will-change: text-shadow;
 }
 
 /* Glass morphism effect */
 .glass-effect {
   background: rgba(26, 26, 26, 0.7);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  will-change: background, backdrop-filter;
 }
 
-/* Animated gradient background */
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
+/* Performance-optimized animated gradient */
 .animated-gradient {
   background: linear-gradient(
     270deg,
@@ -97,9 +131,23 @@ body {
   );
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;
+  will-change: background-position;
 }
 
-/* Floating animation */
+/* Reduced animation for mobile */
+@media (max-width: 768px) {
+  .animated-gradient {
+    animation-duration: 30s;
+  }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Floating animation - optimized */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
@@ -107,9 +155,17 @@ body {
 
 .float-animation {
   animation: float 3s ease-in-out infinite;
+  will-change: transform;
 }
 
-/* Pulse glow animation */
+/* Reduced motion for floating */
+@media (prefers-reduced-motion: reduce) {
+  .float-animation {
+    animation: none;
+  }
+}
+
+/* Pulse glow animation - mobile optimized */
 @keyframes pulse-glow {
   0%, 100% { 
     box-shadow: 0 0 5px var(--accent-wine), 0 0 10px var(--accent-wine);
@@ -121,6 +177,7 @@ body {
 
 .pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+  will-change: box-shadow;
 }
 
 /* Shimmer effect for loading */
@@ -138,6 +195,7 @@ body {
   );
   background-size: 200% 100%;
   animation: shimmer 2s linear infinite;
+  will-change: background-position;
 }
 
 /* Wine pour animation */
@@ -165,4 +223,113 @@ body {
 :focus-visible {
   outline: 2px solid var(--accent-gold);
   outline-offset: 2px;
+}
+
+/* Entry animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* Mobile-specific touch optimizations */
+@media (max-width: 768px) {
+  /* Prevent text selection on interactive elements */
+  button, 
+  a, 
+  .touch-none {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Active state for touch */
+  .touch-active:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+  
+  /* Prevent double-tap zoom */
+  * {
+    touch-action: manipulation;
+  }
+  
+  /* Better touch targets */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Mobile card flip optimization */
+.perspective-1000 {
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+/* Hardware-accelerated transforms */
+.gpu-accelerated {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Mobile-safe area support */
+@supports (padding: max(0px)) {
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-top {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+}
+
+/* Prevent layout shift */
+img, 
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Loading skeleton for mobile */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-primary-light) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Dark mode media query (for devices that prefer dark mode) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
 }
