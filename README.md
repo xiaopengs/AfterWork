@@ -4,6 +4,9 @@
 ---
 
 <p align="center">
+  <a href="https://vercel.com/new/clone?repository-url=https://github.com/xiaopengs/AfterWork">
+    <img src="https://vercel.com/button" alt="Deploy with Vercel">
+  </a>
   <img src="https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js" alt="Next.js">
   <img src="https://img.shields.io/badge/React-18.3-blue?style=flat-square&logo=react" alt="React">
   <img src="https://img.shields.io/badge/Prisma-5.22-2D3748?style=flat-square&logo=prisma" alt="Prisma">
