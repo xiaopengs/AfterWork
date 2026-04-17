@@ -40,6 +40,14 @@ const mockComments: Comment[] = [
   },
 ];
 
+// 格式化时间函数
+const formatTime = (timeStr: string): string => {
+  if (timeStr.includes('分钟') || timeStr.includes('刚刚') || timeStr.includes('小时')) {
+    return timeStr;
+  }
+  return timeStr;
+};
+
 export default function PostDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -52,7 +60,13 @@ export default function PostDetailPage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 获取相关推荐（相同心情的帖子）
+  const relatedPosts = allPosts
+    .filter(p => p.mood === post?.mood && p.id !== postId)
+    .slice(0, 3);
 
   useEffect(() => {
     if (post) {
@@ -79,7 +93,6 @@ export default function PostDetailPage() {
     setIsLiked(!isLiked);
     setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
     
-    // 保存状态
     const savedLikes = localStorage.getItem('forum_liked_posts');
     const liked = savedLikes ? JSON.parse(savedLikes) : [];
     if (isLiked) {
@@ -92,7 +105,6 @@ export default function PostDetailPage() {
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
     
-    // 保存状态
     const savedBookmarks = localStorage.getItem('forum_bookmarked_posts');
     const bookmarked = savedBookmarks ? JSON.parse(savedBookmarks) : [];
     if (isBookmarked) {
@@ -102,12 +114,19 @@ export default function PostDetailPage() {
     }
   };
 
+  const handleShare = () => {
+    setIsSharing(true);
+    // 模拟分享
+    setTimeout(() => {
+      setIsSharing(false);
+    }, 1500);
+  };
+
   const handleSubmitComment = async () => {
     if (!newComment.trim() || isSubmitting) return;
     
     setIsSubmitting(true);
     
-    // 模拟提交
     await new Promise(resolve => setTimeout(resolve, 500));
     
     const comment: Comment = {
@@ -121,7 +140,6 @@ export default function PostDetailPage() {
     setNewComment('');
     setIsSubmitting(false);
     
-    // 清空输入框焦点
     if (textareaRef.current) {
       textareaRef.current.focus();
     }
@@ -149,8 +167,10 @@ export default function PostDetailPage() {
     );
   }
 
+  const moodColor = getMoodColor(post.mood);
+
   return (
-    <div className={`min-h-screen pb-32 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen pb-36 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       {/* Header */}
       <header className="sticky top-0 z-50 glass-effect border-b border-white/5">
         <div className="flex items-center justify-between px-4 py-3">
@@ -161,30 +181,42 @@ export default function PostDetailPage() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            <span>返回</span>
+            <span className="hidden sm:inline">返回</span>
           </button>
           <span className="font-serif text-text-primary text-sm">帖子详情</span>
-          <div className="w-16" />
+          <div className="w-12" />
         </div>
       </header>
 
-      {/* Post Content */}
+      {/* Post Content with Mood Glow */}
       <article className="p-4">
+        {/* Mood Atmosphere Effect */}
+        <div 
+          className="fixed top-0 left-1/2 -translate-x-1/2 w-[120%] h-64 opacity-20 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse at center top, ${moodColor}40 0%, transparent 70%)`,
+          }}
+        />
+        
         {/* Post Header */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="relative flex items-center gap-4 mb-6 pt-4">
+          {/* Large Mood Emoji */}
           <div 
-            className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
-            style={{ background: `${getMoodColor(post.mood)}20` }}
+            className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl shadow-lg"
+            style={{ 
+              background: `${moodColor}25`,
+              boxShadow: `0 0 40px ${moodColor}30`
+            }}
           >
             {getMoodEmoji(post.mood)}
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span 
-                className="text-xs px-2 py-0.5 rounded-full"
+                className="text-xs px-2.5 py-1 rounded-full font-medium"
                 style={{ 
-                  background: `${getMoodColor(post.mood)}30`,
-                  color: getMoodColor(post.mood)
+                  background: `${moodColor}30`,
+                  color: moodColor
                 }}
               >
                 {post.mood}
@@ -194,86 +226,48 @@ export default function PostDetailPage() {
                 {post.author}
               </span>
             </div>
-            <p className="text-text-secondary/60 text-xs">{post.createdAt}</p>
+            <p className="text-text-secondary/50 text-xs mt-1">{formatTime(post.createdAt)}</p>
           </div>
         </div>
 
         {/* Post Content */}
         <div 
-          className="p-4 rounded-xl mb-4"
+          className="p-5 rounded-2xl mb-6 relative overflow-hidden"
           style={{
             background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.08)',
           }}
         >
-          <p className="text-text-primary/90 leading-relaxed whitespace-pre-wrap">
+          <p className="text-text-primary/90 leading-relaxed whitespace-pre-wrap text-base">
             {post.content}
           </p>
           
           {post.drink && (
-            <div className="mt-4 pt-4 border-t border-white/5">
-              <span className="text-sm text-accent-gold/80 bg-accent-gold/10 px-3 py-1.5 rounded-full">
-                🍸 {post.drink}
+            <div className="mt-5 pt-4 border-t border-white/5">
+              <span className="text-sm text-accent-gold/90 bg-accent-gold/10 px-4 py-2 rounded-full inline-flex items-center gap-2">
+                <span>🍸</span>
+                <span>{post.drink}</span>
               </span>
             </div>
           )}
         </div>
 
-        {/* Post Actions */}
-        <div className="flex items-center justify-between px-2 mb-6">
-          <div className="flex items-center gap-6">
-            {/* Like */}
-            <button 
-              onClick={handleLike}
-              className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all active:scale-95 ${
-                isLiked 
-                  ? 'bg-red-500/20 text-red-400' 
-                  : 'bg-white/5 text-text-secondary hover:bg-white/10'
-              }`}
-            >
-              <span className="text-lg">
-                {isLiked ? '❤️' : '🤍'}
-              </span>
-              <span className="text-sm font-medium">{likeCount}</span>
-            </button>
-
-            {/* Comment */}
-            <div className="flex items-center gap-2 text-text-secondary px-3 py-2">
-              <span className="text-lg">💬</span>
-              <span className="text-sm font-medium">{comments.length}</span>
-            </div>
+        {/* Comments Section with Atmosphere */}
+        <div className="mb-6">
+          {/* Atmosphere Header */}
+          <div className="text-center mb-6 py-4 relative">
+            <div 
+              className="absolute inset-0 opacity-10 rounded-xl"
+              style={{
+                background: `linear-gradient(90deg, transparent, ${moodColor}30, transparent)`
+              }}
+            />
+            <p className="text-text-secondary/70 text-sm italic relative">
+              酒过三巡，大家都在
+            </p>
           </div>
 
-          {/* Bookmark */}
-          <button 
-            onClick={handleBookmark}
-            className={`p-2.5 rounded-full transition-all active:scale-90 ${
-              isBookmarked 
-                ? 'bg-accent-gold/20 text-accent-gold' 
-                : 'bg-white/5 text-text-secondary hover:bg-white/10'
-            }`}
-          >
-            <svg 
-              width="18" 
-              height="18" 
-              viewBox="0 0 24 24" 
-              fill={isBookmarked ? 'currentColor' : 'none'} 
-              stroke="currentColor" 
-              strokeWidth="2"
-            >
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Comments Section */}
-        <div className="mb-4">
-          <h3 className="text-text-secondary text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
-            <span>💬</span>
-            <span>{comments.length} 条评论</span>
-          </h3>
-
-          {/* Comments List */}
+          {/* Comments List - Single Column on Mobile */}
           <div className="space-y-4">
             {comments.map((comment, index) => (
               <div 
@@ -281,15 +275,18 @@ export default function PostDetailPage() {
                 className="flex gap-3 animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm flex-shrink-0">
+                <div 
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-sm flex-shrink-0"
+                  style={{ background: `${moodColor}20` }}
+                >
                   {comment.author[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1.5">
                     <span className="text-text-primary text-sm font-medium">
                       {comment.author}
                     </span>
-                    <span className="text-text-secondary/50 text-xs">
+                    <span className="text-text-secondary/40 text-xs">
                       {comment.createdAt}
                     </span>
                   </div>
@@ -301,43 +298,163 @@ export default function PostDetailPage() {
             ))}
           </div>
         </div>
+
+        {/* Related Posts Section */}
+        {relatedPosts.length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-text-secondary text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
+              <span>✨</span>
+              <span>同心情的其他故事</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {relatedPosts.map((relatedPost) => (
+                <Link
+                  key={relatedPost.id}
+                  href={`/bar/forum/${relatedPost.id}`}
+                  className="block p-4 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">
+                      {getMoodEmoji(relatedPost.mood)}
+                    </span>
+                    <span 
+                      className="text-xs px-2 py-0.5 rounded-full"
+                      style={{ 
+                        background: `${getMoodColor(relatedPost.mood)}30`,
+                        color: getMoodColor(relatedPost.mood)
+                      }}
+                    >
+                      {relatedPost.mood}
+                    </span>
+                  </div>
+                  <p className="text-text-primary/80 text-sm line-clamp-2 leading-relaxed">
+                    {relatedPost.content.slice(0, 60)}...
+                  </p>
+                  <p className="text-text-secondary/40 text-xs mt-2">
+                    {relatedPost.author} · {relatedPost.likes}赞
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </article>
 
-      {/* Comment Input */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 glass-effect border-t border-white/5">
-        <div className="flex items-end gap-3">
-          <div className="flex-1 relative">
-            <textarea
-              ref={textareaRef}
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmitComment();
-                }
-              }}
-              placeholder="说点什么..."
-              className="w-full p-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-text-primary placeholder-text-secondary/40 resize-none focus:outline-none focus:border-accent-wine/50 transition-colors text-sm"
-              style={{ minHeight: '48px', maxHeight: '120px' }}
-              rows={1}
-            />
+      {/* Fixed Bottom Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 glass-effect border-t border-white/5 z-40">
+        <div className="p-4">
+          <div className="flex items-center justify-between max-w-lg mx-auto">
+            {/* Left Actions: Like + Comment Count */}
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={handleLike}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all active:scale-95 ${
+                  isLiked 
+                    ? 'bg-red-500/20 text-red-400' 
+                    : 'bg-white/5 text-text-secondary hover:bg-white/10'
+                }`}
+              >
+                <span className="text-lg">
+                  {isLiked ? '❤️' : '🤍'}
+                </span>
+                <span className="text-sm font-medium">{likeCount}</span>
+              </button>
+
+              <div className="flex items-center gap-2 text-text-secondary bg-white/5 px-4 py-2.5 rounded-full">
+                <span className="text-lg">💬</span>
+                <span className="text-sm font-medium">{comments.length}</span>
+              </div>
+            </div>
+
+            {/* Right Actions: Bookmark + Share */}
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={handleBookmark}
+                className={`p-2.5 rounded-full transition-all active:scale-90 ${
+                  isBookmarked 
+                    ? 'bg-accent-gold/20 text-accent-gold' 
+                    : 'bg-white/5 text-text-secondary hover:bg-white/10'
+                }`}
+              >
+                <svg 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 24 24" 
+                  fill={isBookmarked ? 'currentColor' : 'none'} 
+                  stroke="currentColor" 
+                  strokeWidth="2"
+                >
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                </svg>
+              </button>
+
+              <button 
+                onClick={handleShare}
+                className={`p-2.5 rounded-full transition-all active:scale-90 ${
+                  isSharing
+                    ? 'bg-accent-wine/20 text-accent-wine' 
+                    : 'bg-white/5 text-text-secondary hover:bg-white/10'
+                }`}
+              >
+                {isSharing ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
-          <button
-            onClick={handleSubmitComment}
-            disabled={!newComment.trim() || isSubmitting}
-            className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95 ${
-              newComment.trim() && !isSubmitting
-                ? 'bg-accent-wine text-text-primary'
-                : 'bg-white/10 text-text-secondary/50'
-            }`}
-          >
-            {isSubmitting ? (
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : (
-              '发送'
-            )}
-          </button>
+
+          {/* Comment Input - Fixed Bottom */}
+          <div className="flex items-end gap-3 mt-4 max-w-lg mx-auto">
+            <div className="flex-1 relative">
+              <textarea
+                ref={textareaRef}
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmitComment();
+                  }
+                }}
+                placeholder="来都来了，说两句？"
+                className="w-full p-3 pr-14 rounded-xl bg-white/5 border border-white/10 text-text-primary placeholder-text-secondary/40 resize-none focus:outline-none focus:border-accent-wine/50 transition-colors text-sm"
+                style={{ minHeight: '48px', maxHeight: '120px' }}
+                rows={1}
+              />
+            </div>
+            <button
+              onClick={handleSubmitComment}
+              disabled={!newComment.trim() || isSubmitting}
+              className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95 flex items-center gap-2 ${
+                newComment.trim() && !isSubmitting
+                  ? 'bg-accent-wine text-text-primary'
+                  : 'bg-white/10 text-text-secondary/50'
+              }`}
+            >
+              {isSubmitting ? (
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span>🍶</span>
+                  <span>发送</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -354,6 +471,12 @@ export default function PostDetailPage() {
         }
         .animate-fade-in {
           animation: fade-in 0.3s ease-out forwards;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
       `}</style>
     </div>
