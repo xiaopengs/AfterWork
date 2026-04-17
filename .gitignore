@@ -1,3 +1,14 @@
 node_modules
 # Keep environment variables out of version control
 .env
+
+# Local env files
+.env.local
+.env.*.local
+
+# Keep .env.example but remove any local .env
+.env
+.env.production
+
+# Vercel
+.vercel
