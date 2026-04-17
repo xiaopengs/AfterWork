@@ -170,9 +170,11 @@ pnpm start
 
 3. **配置环境变量**
    ```
-   DATABASE_URL="file:./prod.db"
-   NEXTAUTH_SECRET="your-secret-key-min-32-chars"
-   OPENAI_API_KEY="sk-..."  # 可选，启用 AI 功能
+   DATABASE_URL="postgresql://..."
+   NEXT_PUBLIC_SUPABASE_URL="your_supabase_url"
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="your_supabase_anon_key"
+   NEXTAUTH_SECRET="your-s...hars"
+   OPENAI_API_KEY="***"  # 可选，启用 AI 功能
    ```
 
 4. **部署**
@@ -181,6 +183,28 @@ pnpm start
 
 5. **域名配置**（可选）
    - 在 Project Settings → Domains 添加自定义域名
+
+### Supabase
+
+1. **创建 Supabase 项目**
+   - 访问 [supabase.com](https://supabase.com) 创建新项目
+   - 在 Settings → Database 获取连接信息
+
+2. **配置环境变量**
+   ```env
+   DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+   NEXT_PUBLIC_SUPABASE_URL="https://[YOUR-PROJECT-REF].supabase.co"
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+   ```
+
+3. **推送数据库 schema**
+   ```bash
+   pnpm db:push
+   ```
+
+4. **（可选）启用实时订阅**
+   - 在 Supabase Dashboard 启用 Realtime 功能
+   - 使用 `lib/supabase.ts` 中的 `supabase` 客户端进行订阅
 
 ### Docker
 
