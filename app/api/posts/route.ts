@@ -9,10 +9,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
+    const mood = searchParams.get('mood');
+
+    const where = mood && mood !== '全部' ? { mood } : {};
 
     const posts = await prisma.post.findMany({
       take: limit,
       skip: offset,
+      where,
       orderBy: { createdAt: 'desc' },
       include: {
         user: {
@@ -21,7 +25,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const total = await prisma.post.count();
+    const total = await prisma.post.count({ where });
 
     return NextResponse.json({
       posts: posts.map(p => ({
@@ -29,9 +33,11 @@ export async function GET(request: NextRequest) {
         content: p.content,
         mood: p.mood,
         likes: p.likes,
-        comments: p.comments,
+        comments: (p as any).commentCount ?? 0,
         createdAt: p.createdAt.toISOString(),
         author: p.anonymous ? '匿名' : p.user?.username || '匿名',
+        liked: false,
+        bookmarked: false,
       })),
       total,
       hasMore: offset + limit < total,
@@ -82,10 +88,80 @@ export async function POST(request: NextRequest) {
         comments: post.comments,
         createdAt: post.createdAt.toISOString(),
         author: post.anonymous ? '匿名' : payload.username,
+        liked: false,
+        bookmarked: false,
       },
     });
   } catch (error) {
     console.error('POST posts error:', error);
     return NextResponse.json({ error: '发布失败' }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const action = searchParams.get('action');
+    const postId = searchParams.get('postId');
+
+    if (!postId) {
+      return NextResponse.json({ error: '缺少帖子ID' }, { status: 400 });
+    }
+
+    const authHeader = request.headers.get('Authorization');
+    let userId: string | undefined;
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.slice(7);
+      const payload = verifyToken(token);
+      if (payload) {
+        userId = payload.userId;
+      }
+    }
+
+    if (action === 'like') {
+      const post = await prisma.post.update({
+        where: { id: postId },
+        data: { likes: { increment: 1 } },
+      });
+      return NextResponse.json({ success: true, likes: post.likes });
+    }
+
+    if (action === 'unlike') {
+      const post = await prisma.post.update({
+        where: { id: postId },
+        data: { likes: { decrement: 1 } },
+      });
+      return NextResponse.json({ success: true, likes: Math.max(0, post.likes) });
+    }
+
+    if (action === 'bookmark') {
+      if (!userId) {
+        return NextResponse.json({ error: '请先登录' }, { status: 401 });
+      }
+
+      const existing = await prisma.bookmark.findUnique({
+        where: {
+          userId_postId: { userId, postId },
+        },
+      });
+
+      if (existing) {
+        await prisma.bookmark.delete({
+          where: { id: existing.id },
+        });
+        return NextResponse.json({ success: true, bookmarked: false });
+      } else {
+        await prisma.bookmark.create({
+          data: { userId, postId },
+        });
+        return NextResponse.json({ success: true, bookmarked: true });
+      }
+    }
+
+    return NextResponse.json({ error: '未知操作' }, { status: 400 });
+  } catch (error) {
+    console.error('PATCH posts error:', error);
+    return NextResponse.json({ error: '操作失败' }, { status: 500 });
   }
 }

@@ -13,6 +13,8 @@ export default function ComposePage() {
   const [content, setContent] = useState('');
   const [selectedDrink, setSelectedDrink] = useState<string>('');
   const [isPosting, setIsPosting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   const maxLength = 500;
   const remainingChars = maxLength - content.length;
@@ -22,24 +24,69 @@ export default function ComposePage() {
     
     setIsPosting(true);
     
-    // 模拟发布延迟
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // TODO: 实际项目中这里应该调用API保存帖子
-    console.log('Post created:', {
-      mood: selectedMood,
-      content: content.trim(),
-      drink: selectedDrink,
-    });
-    
-    setIsPosting(false);
-    router.push('/bar/forum');
+    try {
+      // 模拟发布请求
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
+      // 保存到本地存储（模拟成功）
+      const newPost = {
+        id: `local-${Date.now()}`,
+        mood: selectedMood,
+        content: content.trim(),
+        drink: selectedDrink,
+        author: '我',
+        likes: 0,
+        comments: 0,
+        createdAt: '刚刚',
+      };
+      
+      // 更新本地帖子数据
+      const savedPosts = localStorage.getItem('forum_posts');
+      const posts = savedPosts ? JSON.parse(savedPosts) : [];
+      localStorage.setItem('forum_posts', JSON.stringify([newPost, ...posts]));
+      
+      // 显示成功动画
+      setIsSuccess(true);
+      
+      // 淡出动画后跳转
+      setTimeout(() => {
+        setIsVisible(false);
+        setTimeout(() => {
+          router.push('/bar/forum');
+        }, 300);
+      }, 800);
+    } catch (error) {
+      console.error('Post failed:', error);
+      setIsPosting(false);
+    }
   };
 
-  const canPost = selectedMood && content.trim().length > 0 && !isPosting;
+  const canPost = selectedMood && content.trim().length > 0 && !isPosting && !isSuccess;
+
+  // 自动调整 textarea 高度
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value.slice(0, maxLength);
+    setContent(value);
+    
+    // 自动调整高度
+    e.target.style.height = 'auto';
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
+  };
 
   return (
-    <div className="min-h-screen pb-24">
+    <div className={`min-h-screen pb-24 transition-all duration-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+      {/* Success Overlay */}
+      {isSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-success-overlay">
+          <div className="text-center">
+            <div className="text-6xl mb-4 animate-success-icon">✨</div>
+            <p className="text-text-primary text-lg font-serif animate-success-text">
+              酿造完成
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="sticky top-0 z-50 glass-effect border-b border-white/5">
         <div className="flex items-center justify-between px-4 py-3">
@@ -55,11 +102,18 @@ export default function ComposePage() {
             disabled={!canPost}
             className={`text-sm px-4 py-1.5 rounded-full transition-all ${
               canPost
-                ? 'bg-accent-wine text-text-primary active:scale-95'
+                ? 'bg-accent-wine text-text-primary active:scale-95 hover:bg-accent-wine/90'
                 : 'bg-white/10 text-text-secondary/50'
             }`}
           >
-            {isPosting ? '发布中...' : '发布'}
+            {isPosting ? (
+              <span className="flex items-center gap-1.5">
+                <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+                <span>酿造中</span>
+              </span>
+            ) : (
+              '发布'
+            )}
           </button>
         </div>
       </header>
@@ -112,7 +166,7 @@ export default function ComposePage() {
               想说点什么
             </h3>
             <span 
-              className={`text-xs ${
+              className={`text-xs transition-colors ${
                 remainingChars < 50 
                   ? remainingChars < 20 
                     ? 'text-red-400' 
@@ -125,9 +179,9 @@ export default function ComposePage() {
           </div>
           <textarea
             value={content}
-            onChange={(e) => setContent(e.target.value.slice(0, maxLength))}
+            onChange={handleTextareaChange}
             placeholder="这里没有人认识你，可以说出心里话..."
-            className="w-full h-48 p-4 rounded-xl bg-white/5 border border-white/5 text-text-primary placeholder-text-secondary/40 resize-none focus:outline-none focus:border-accent-wine/50 transition-colors text-sm leading-relaxed"
+            className="w-full p-4 rounded-xl bg-white/5 border border-white/5 text-text-primary placeholder-text-secondary/40 resize-none focus:outline-none focus:border-accent-wine/50 transition-colors text-sm leading-relaxed"
             style={{ minHeight: '200px' }}
           />
         </section>
@@ -172,18 +226,29 @@ export default function ComposePage() {
         </div>
       </div>
 
-      {/* Bottom Post Button (Backup) */}
+      {/* Bottom Post Button */}
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-effect border-t border-white/5">
         <button
           onClick={handlePost}
           disabled={!canPost}
           className={`w-full py-3.5 rounded-xl font-medium text-sm transition-all active:scale-[0.98] ${
             canPost
-              ? 'bg-accent-wine text-text-primary'
+              ? 'bg-accent-wine text-text-primary shadow-lg hover:shadow-xl'
               : 'bg-white/10 text-text-secondary/50'
           }`}
+          style={canPost ? { boxShadow: '0 4px 20px rgba(139, 41, 66, 0.3)' } : {}}
         >
-          {isPosting ? '🍷 酿造中...' : '🍷 发布此刻'}
+          {isPosting ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="text-lg animate-pulse">🍷</span>
+              <span>酿造中...</span>
+            </span>
+          ) : (
+            <span className="flex items-center justify-center gap-2">
+              <span>🍷</span>
+              <span>发布此刻</span>
+            </span>
+          )}
         </button>
       </div>
 
@@ -194,6 +259,47 @@ export default function ComposePage() {
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        @keyframes success-overlay {
+          0% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+        .animate-success-overlay {
+          animation: success-overlay 0.3s ease-out forwards;
+        }
+        @keyframes success-icon {
+          0% {
+            opacity: 0;
+            transform: scale(0.5) rotate(-10deg);
+          }
+          50% {
+            transform: scale(1.2) rotate(5deg);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+          }
+        }
+        .animate-success-icon {
+          animation: success-icon 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes success-text {
+          0% {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-success-text {
+          animation: success-text 0.4s ease-out 0.2s forwards;
+          opacity: 0;
         }
       `}</style>
     </div>
