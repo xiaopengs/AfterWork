@@ -7,16 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String    @id @default(cuid())
+  username  String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  memories  Memory[]
+}
+
 model Drink {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   nameEn      String?
   description String?
   abv         Float?
   image       String?
-  tags        String   @default("[]")
-  rating      Float    @default(0)
-  createdAt   DateTime @default(now())
+  tags        String    @default("[]")
+  rating      Float     @default(0)
+  createdAt   DateTime  @default(now())
   memories    Memory[]
 }
 
@@ -24,6 +32,8 @@ model Memory {
   id        String   @id @default(cuid())
   content   String
   mood      String?
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
   drinkId   String?
   drink     Drink?   @relation(fields: [drinkId], references: [id])
   createdAt DateTime @default(now())

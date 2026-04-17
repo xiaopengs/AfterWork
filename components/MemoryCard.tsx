@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 interface MemoryCardProps {
-  id: number;
+  id: string | number;
   title: string;
   content: string;
   mood: string;

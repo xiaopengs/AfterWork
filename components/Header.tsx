@@ -1,14 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<{ id: string; username: string } | null>(null);
+  const [showMenu, setShowMenu] = useState(false);
+
+  useEffect(() => {
+    // 检查用户登录状态
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    if (token && userStr) {
+      try {
+        setUser(JSON.parse(userStr));
+      } catch {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    }
+  }, [pathname]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    router.push('/');
+  };
 
   const navItems = [
     { href: "/", label: "首页", icon: "🏠" },
     { href: "/bar", label: "品酒间", icon: "🍷" },
+    { href: "/fortune", label: "占卜", icon: "🎴" },
     { href: "/memories", label: "回忆墙", icon: "📜" },
   ];
 
@@ -48,20 +74,40 @@ export default function Header() {
             })}
           </div>
 
-          {/* Time display */}
-          <div className="hidden lg:block text-right">
-            <p className="text-text-secondary text-xs">
-              {new Date().toLocaleDateString("zh-CN", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
+          {/* User / Auth */}
+          <div className="flex items-center gap-4">
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent-wine/20 text-accent-gold hover:bg-accent-wine/30 transition-all"
+                >
+                  <span>👤</span>
+                  <span className="hidden sm:inline">{user.username}</span>
+                </button>
+                {showMenu && (
+                  <div className="absolute right-0 mt-2 w-40 py-2 glass-effect rounded-lg border border-white/10">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-text-secondary hover:text-red-400 hover:bg-white/5 transition-all"
+                    >
+                      退出登录
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="px-4 py-2 rounded-lg bg-accent-wine/20 text-accent-gold hover:bg-accent-wine/30 transition-all"
+              >
+                登录
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-3">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (

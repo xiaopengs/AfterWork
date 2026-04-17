@@ -16,7 +16,11 @@
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "ai": "^6.0.164",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
     "next": "14",
     "openai": "^6.34.0",
     "prisma": "5.22.0",
