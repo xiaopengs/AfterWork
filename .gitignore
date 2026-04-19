@@ -29,5 +29,9 @@ yarn-error.log*
 *.swp
 *.swo
 prisma/dev.db
+
+# Exclude docs folder from HTML/CSS ignore rules
 *.html
 *.css
+!docs/*.css
+!docs/*.html
