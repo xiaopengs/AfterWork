@@ -4,7 +4,7 @@
   "description": "午后酒馆 - After Work Wine Bar",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "DATABASE_URL=\"postgresql://placeholder\" prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
