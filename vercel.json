@@ -3,5 +3,8 @@
   "buildCommand": "pnpm prisma generate && pnpm run build",
   "devCommand": "pnpm run dev",
   "installCommand": "pnpm install",
-  "regions": ["sin1"]
+  "regions": ["sin1"],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
