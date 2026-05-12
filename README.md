@@ -64,7 +64,7 @@
 
 ### 🍸 心情选酒系统
 - 9种心情维度 × 28款特调酒品
-- AI驱动的智能推荐（基于 OpenAI）
+- AI驱动的智能推荐（基于 OpenRouter）
 - 调酒师"老陈"的专属故事
 - 酒水属性分析（创造力/灵感/清醒/沉醉）
 
@@ -115,7 +115,7 @@
 ### AI Integration
 | 技术 | 版本 | 用途 |
 |------|------|------|
-| OpenAI | 6.34.0 | AI 对话与推荐 |
+| OpenRouter | 6.34.0 | AI 对话与推荐 |
 | Vercel AI SDK | 6.0.164 | AI 能力扩展 |
 
 ### Authentication
@@ -177,7 +177,7 @@ pnpm start
    NEXT_PUBLIC_SUPABASE_URL="your_supabase_url"
    NEXT_PUBLIC_SUPABASE_ANON_KEY="your_supabase_anon_key"
    NEXTAUTH_SECRET="your-s...hars"
-   OPENAI_API_KEY="***"  # 可选，启用 AI 功能
+   OPENROUTER_API_KEY="sk-or-..."  # 可选，启用 AI 功能
    ```
 
 4. **部署**
@@ -250,14 +250,14 @@ NEXTAUTH_SECRET="your-super-secret-key-minimum-32-characters-long"
 NEXTAUTH_URL="http://localhost:3000"
 
 # AI Features (Optional)
-OPENAI_API_KEY="sk-..."
+OPENROUTER_API_KEY="sk-or-..."
 ```
 
 | 变量名 | 必填 | 说明 |
 |--------|------|------|
 | DATABASE_URL | 是 | SQLite 数据库路径 |
 | NEXTAUTH_SECRET | 是 | JWT 签名密钥（至少32字符） |
-| OPENAI_API_KEY | 否 | 启用 AI 推荐与对话功能 |
+| OPENROUTER_API_KEY | 否 | 启用 AI 推荐与对话功能 |
 
 ---
 

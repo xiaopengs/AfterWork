@@ -1,8 +1,12 @@
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
-  baseURL: process.env.OPENAI_BASE_URL || undefined,
+  apiKey: process.env.OPENROUTER_API_KEY || '',
+  baseURL: 'https://openrouter.ai/api/v1',
+  defaultHeaders: {
+    'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://afterwork.app',
+    'X-Title': 'AfterWork - 午后酒馆',
+  },
 });
 
 export interface ChatMessage {
@@ -21,6 +25,9 @@ export interface AIResponse {
 
 export type StreamCallback = (chunk: string) => void;
 
+// OpenRouter model mapping - use free or cheap models by default
+const DEFAULT_MODEL = 'anthropic/claude-3-haiku';
+
 export async function generateAIResponse(
   messages: ChatMessage[],
   options?: {
@@ -30,7 +37,7 @@ export async function generateAIResponse(
   }
 ): Promise<AIResponse> {
   const response = await openai.chat.completions.create({
-    model: options?.model || 'gpt-4o-mini',
+    model: options?.model || DEFAULT_MODEL,
     messages: messages as OpenAI.Chat.ChatCompletionMessageParam[],
     temperature: options?.temperature ?? 0.8,
     max_tokens: options?.maxTokens ?? 1024,
@@ -55,7 +62,7 @@ export async function streamAIResponse(
   }
 ): Promise<void> {
   const stream = await openai.chat.completions.create({
-    model: options?.model || 'gpt-4o-mini',
+    model: options?.model || DEFAULT_MODEL,
     messages: messages as OpenAI.Chat.ChatCompletionMessageParam[],
     temperature: options?.temperature ?? 0.8,
     stream: true,
