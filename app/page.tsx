@@ -3,32 +3,19 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import PouringGlass from "@/components/PouringGlass";
+import { GlowText, FadeIn, Card, Badge } from "@/components/ui";
 
-const moods = ["温暖", "深思", "俏皮", "荒诞", "裂隙", "分裂", "脆弱", "猎奇", "苦甜"];
-
-const moodColors: Record<string, string> = {
-  温暖: "#FF6B6B",
-  深思: "#4ECDC4",
-  俏皮: "#FFE66D",
-  荒诞: "#95E1D3",
-  裂隙: "#A8E6CF",
-  分裂: "#DDA0DD",
-  脆弱: "#87CEEB",
-  猎奇: "#FF8C00",
-  苦甜: "#8B4513",
-};
-
-const moodEmojis: Record<string, string> = {
-  温暖: "🔥",
-  深思: "🌊",
-  俏皮: "✨",
-  荒诞: "🎭",
-  裂隙: "⚡",
-  分裂: "🔀",
-  脆弱: "🦋",
-  猎奇: "🔮",
-  苦甜: "🍫",
-};
+const moods = [
+  { name: "温暖", emoji: "🔥", color: "#FF6B6B", desc: "寻找温度" },
+  { name: "深思", emoji: "🌊", color: "#4ECDC4", desc: "整理思绪" },
+  { name: "俏皮", emoji: "✨", color: "#FFE66D", desc: "轻松一刻" },
+  { name: "猎奇", emoji: "🔮", color: "#FF8C00", desc: "探索未知" },
+  { name: "裂隙", emoji: "⚡", color: "#A8E6CF", desc: "突破边界" },
+  { name: "脆弱", emoji: "🦋", color: "#87CEEB", desc: "释放情绪" },
+  { name: "分裂", emoji: "🔀", color: "#DDA0DD", desc: "释放自我" },
+  { name: "苦甜", emoji: "🍫", color: "#8B4513", desc: "品味人生" },
+  { name: "荒诞", emoji: "🎭", color: "#95E1D3", desc: "打破常规" },
+];
 
 const drinks = [
   { id: "1", name: "落日威士忌", mood: "温暖", color: "#D4A574", desc: "如落日般温暖的威士忌" },
@@ -57,7 +44,7 @@ export default function HomePage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setPhase("welcome");
-    }, 500);
+    }, 800);
     return () => clearTimeout(timer);
   }, []);
 
@@ -66,7 +53,7 @@ export default function HomePage() {
     if (phase === "welcome") {
       const timer = setTimeout(() => {
         setPhase("mood");
-      }, 2500);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [phase]);
@@ -81,9 +68,8 @@ export default function HomePage() {
     }
   }, [selectedDrink]);
 
-  const handleMoodSelect = (mood: string) => {
-    const color = moodColors[mood] || "#8B2942";
-    setBgColor(color);
+  const handleMoodSelect = (mood: typeof moods[0]) => {
+    setBgColor(mood.color);
     setPhase("drink");
     setShowDrinks(true);
   };
@@ -110,22 +96,25 @@ export default function HomePage() {
         background: isEntering
           ? "#000"
           : phase === "mood" || phase === "drink" || phase === "ready"
-          ? `radial-gradient(ellipse at center, ${bgColor}30 0%, #0D0D0D 70%)`
+          ? `radial-gradient(ellipse at center, ${bgColor}25 0%, #0D0D0D 70%)`
           : "#0D0D0D",
-        transition: "background 1s ease",
+        transition: "background 1.2s ease",
       }}
     >
       {/* Ambient particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(30)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 rounded-full bg-white/20 animate-float-particle"
+            className="absolute w-1 h-1 rounded-full animate-particle"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 4}s`,
+              backgroundColor: i % 3 === 0 ? "#D4A574" : "rgba(255,255,255,0.15)",
+              animationDelay: `${Math.random() * 8}s`,
+              animationDuration: `${4 + Math.random() * 6}s`,
+              width: `${1 + Math.random() * 2}px`,
+              height: `${1 + Math.random() * 2}px`,
             }}
           />
         ))}
@@ -134,138 +123,166 @@ export default function HomePage() {
       {/* Door animation overlay */}
       {phase === "door" && (
         <div className="absolute inset-0 flex items-center justify-center z-50">
-          <div className="text-center animate-fade-in">
-            <div className="text-6xl mb-8 animate-pulse">🚪</div>
-            <p className="text-text-secondary text-lg tracking-widest">推开这扇门</p>
-          </div>
+          <FadeIn>
+            <div className="text-center">
+              <div className="relative">
+                <div className="text-8xl mb-8 animate-pulse-slow">🚪</div>
+                <div 
+                  className="absolute inset-0 blur-xl opacity-50"
+                  style={{ background: "radial-gradient(circle, #8B294240 0%, transparent 70%)" }}
+                />
+              </div>
+              <p className="text-[#A0A0A0] text-lg tracking-[0.3em] animate-pulse-subtle">
+                推开这扇门
+              </p>
+            </div>
+          </FadeIn>
         </div>
       )}
 
       {/* Welcome message */}
       {phase === "welcome" && (
         <div ref={welcomeRef} className="flex flex-col items-center justify-center min-h-screen px-6">
-          <div className="text-center animate-welcome-in">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif text-text-primary mb-6">
-              <span className="inline-block animate-char-in" style={{ animationDelay: "0.1s" }}>欢</span>
-              <span className="inline-block animate-char-in" style={{ animationDelay: "0.2s" }}>迎</span>
-              <span className="inline-block animate-char-in" style={{ animationDelay: "0.3s" }}>光</span>
-              <span className="inline-block animate-char-in" style={{ animationDelay: "0.4s" }}>临</span>
-            </h1>
-            <p className="text-xl sm:text-2xl text-accent-wine font-light tracking-wider animate-char-in" style={{ animationDelay: "0.6s" }}>
-              Welcome to AfterWork
-            </p>
-            <div className="mt-12 animate-char-in" style={{ animationDelay: "1s" }}>
-              <p className="text-text-secondary text-sm tracking-widest">今夜，你想要什么？</p>
+          <FadeIn delay={0} duration={1}>
+            <div className="text-center">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl font-serif text-[#F5F5F5] mb-6 tracking-wide">
+                <span className="inline-block animate-char-in" style={{ animationDelay: "0.1s" }}>欢</span>
+                <span className="inline-block animate-char-in" style={{ animationDelay: "0.2s" }}>迎</span>
+                <span className="inline-block animate-char-in" style={{ animationDelay: "0.3s" }}>光</span>
+                <span className="inline-block animate-char-in" style={{ animationDelay: "0.4s" }}>临</span>
+              </h1>
+              <GlowText color="#D4A574" className="text-2xl sm:text-3xl font-light tracking-[0.2em] animate-char-in" style={{ animationDelay: "0.6s" }}>
+                Welcome to AfterWork
+              </GlowText>
+              <FadeIn delay={1200}>
+                <div className="mt-16">
+                  <p className="text-[#A0A0A0] text-sm tracking-[0.3em]">
+                    今夜，你想要什么？
+                  </p>
+                </div>
+              </FadeIn>
             </div>
-          </div>
+          </FadeIn>
         </div>
       )}
 
       {/* Mood selection */}
       {(phase === "mood" || phase === "drink") && (
-        <div className="flex flex-col items-center justify-center min-h-screen px-4 py-12 animate-content-in">
-          <div className="text-center mb-8">
-            <p className="text-text-secondary text-sm tracking-widest mb-2">此刻的心情</p>
-            <h2 className="text-2xl sm:text-3xl font-serif text-text-primary">
-              {phase === "drink" ? (
-                <span style={{ color: bgColor }}>我明白了</span>
-              ) : (
-                "你正在感受..."
-              )}
-            </h2>
-          </div>
+        <div className="flex flex-col items-center justify-center min-h-screen px-4 py-12">
+          <FadeIn delay={0}>
+            <div className="text-center mb-10">
+              <p className="text-[#A0A0A0] text-xs tracking-[0.4em] uppercase mb-3">此刻的心情</p>
+              <h2 className="text-2xl sm:text-3xl font-serif text-[#F5F5F5]">
+                {phase === "drink" ? (
+                  <GlowText color={bgColor}>我明白了</GlowText>
+                ) : (
+                  "你正在感受..."
+                )}
+              </h2>
+            </div>
+          </FadeIn>
 
           {/* Mood grid */}
-          <div className="grid grid-cols-3 gap-3 max-w-md w-full mb-8">
+          <div className="grid grid-cols-3 gap-4 max-w-lg w-full mb-10">
             {moods.map((mood, index) => (
-              <button
-                key={mood}
-                onClick={() => handleMoodSelect(mood)}
-                className="p-4 rounded-2xl text-center transition-all duration-300 hover:scale-105 active:scale-95"
-                style={{
-                  background: `linear-gradient(135deg, ${moodColors[mood]}15, ${moodColors[mood]}05)`,
-                  border: `1px solid ${moodColors[mood]}30`,
-                  animation: `fade-in-up 0.4s ease forwards`,
-                  animationDelay: `${index * 0.05}s`,
-                  opacity: 0,
-                }}
-              >
-                <span className="text-2xl block mb-1">{moodEmojis[mood]}</span>
-                <span className="text-xs text-text-primary">{mood}</span>
-              </button>
+              <FadeIn key={mood.name} delay={index * 60} duration={0.4}>
+                <button
+                  onClick={() => handleMoodSelect(mood)}
+                  className="p-5 rounded-2xl text-center transition-all duration-300 hover:scale-105 active:scale-95 group"
+                  style={{
+                    background: `linear-gradient(135deg, ${mood.color}15, ${mood.color}05)`,
+                    border: `1px solid ${mood.color}30`,
+                  }}
+                >
+                  <span className="text-3xl block mb-2 transition-transform duration-300 group-hover:scale-110">
+                    {mood.emoji}
+                  </span>
+                  <span className="text-sm text-[#F5F5F5] font-medium block mb-1">{mood.name}</span>
+                  <span className="text-xs text-[#A0A0A0]">{mood.desc}</span>
+                </button>
+              </FadeIn>
             ))}
           </div>
 
           {/* Drinks selection - only show after mood selected */}
           {showDrinks && (
-            <div className="w-full max-w-md animate-content-in">
-              <p className="text-center text-text-secondary text-sm mb-4">为你甄选</p>
-              <div className="space-y-3">
-                {drinks
-                  .filter((d) => d.mood === (selectedDrink?.mood || "温暖"))
-                  .map((drink, index) => (
-                    <button
-                      key={drink.id}
-                      onClick={() => handleDrinkSelect(drink)}
-                      className="w-full p-4 rounded-2xl text-left transition-all duration-300"
-                      style={{
-                        background:
-                          selectedDrink?.id === drink.id
-                            ? `${drink.color}20`
-                            : "rgba(255,255,255,0.03)",
-                        border: `1px solid ${
-                          selectedDrink?.id === drink.id ? drink.color : "rgba(255,255,255,0.1)"
-                        }`,
-                        animation: `fade-in-up 0.3s ease forwards`,
-                        animationDelay: `${index * 0.1}s`,
-                        opacity: 0,
-                      }}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ background: drink.color, boxShadow: `0 0 10px ${drink.color}` }}
-                        />
-                        <div className="flex-1">
-                          <h3 className="text-text-primary font-medium">{drink.name}</h3>
-                          <p className="text-xs text-text-secondary mt-0.5">{drink.desc}</p>
-                        </div>
-                        {selectedDrink?.id === drink.id && (
-                          <span className="text-lg" style={{ color: drink.color }}>✓</span>
-                        )}
-                      </div>
-                    </button>
-                  ))}
+            <FadeIn delay={200} direction="up">
+              <div className="w-full max-w-md">
+                <div className="text-center mb-6">
+                  <Badge color="#D4A574">为你甄选</Badge>
+                </div>
+                <div className="space-y-3">
+                  {drinks
+                    .filter((d) => d.mood === "温暖")
+                    .map((drink, index) => (
+                      <Card
+                        key={drink.id}
+                        hover={false}
+                        className={`
+                          cursor-pointer transition-all duration-300
+                          hover:scale-[1.02] active:scale-[0.98]
+                          ${selectedDrink?.id === drink.id ? "ring-2" : ""}
+                        `}
+                        glow={selectedDrink?.id === drink.id ? drink.color : undefined}
+                      >
+                        <button
+                          onClick={() => handleDrinkSelect(drink)}
+                          className="w-full text-left"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div
+                              className="w-4 h-12 rounded-full shrink-0"
+                              style={{
+                                background: `linear-gradient(to bottom, ${drink.color}, ${drink.color}40)`,
+                                boxShadow: `0 0 15px ${drink.color}50`,
+                              }}
+                            />
+                            <div className="flex-1">
+                              <h3 className="text-[#F5F5F5] font-medium">{drink.name}</h3>
+                              <p className="text-xs text-[#A0A0A0] mt-0.5">{drink.desc}</p>
+                            </div>
+                            {selectedDrink?.id === drink.id && (
+                              <span className="text-lg" style={{ color: drink.color }}>✓</span>
+                            )}
+                          </div>
+                        </button>
+                      </Card>
+                    ))}
+                </div>
               </div>
-            </div>
+            </FadeIn>
           )}
         </div>
       )}
 
       {/* Pouring glass animation when drink selected */}
       {selectedDrink && (
-        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-40 animate-content-in">
-          <PouringGlass color={selectedDrink.color} />
+        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-40">
+          <FadeIn>
+            <PouringGlass color={selectedDrink.color} />
+          </FadeIn>
         </div>
       )}
 
       {/* Ready state - Enter button */}
       {phase === "ready" && selectedDrink && (
-        <div className="fixed bottom-12 left-0 right-0 flex flex-col items-center z-50 animate-content-in">
-          <button
-            onClick={handleEnter}
-            className="px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 hover:scale-105 active:scale-95"
-            style={{
-              background: `linear-gradient(135deg, ${selectedDrink.color}, ${selectedDrink.color}99)`,
-              boxShadow: `0 0 30px ${selectedDrink.color}50, 0 10px 40px rgba(0,0,0,0.5)`,
-              color: "#F5F5F5",
-            }}
-          >
-            <span className="tracking-widest">请 进</span>
-          </button>
-          <p className="text-text-secondary text-xs mt-4 tracking-widest">
-            你的 {selectedDrink.name} 已备好
-          </p>
+        <div className="fixed bottom-16 left-0 right-0 flex flex-col items-center z-50 px-6">
+          <FadeIn direction="up">
+            <button
+              onClick={handleEnter}
+              className="px-12 py-5 rounded-full text-lg font-medium tracking-[0.3em] transition-all duration-300 hover:scale-105 active:scale-95"
+              style={{
+                background: `linear-gradient(135deg, ${selectedDrink.color}, ${selectedDrink.color}99)`,
+                boxShadow: `0 0 40px ${selectedDrink.color}40, 0 15px 50px rgba(0,0,0,0.5)`,
+                color: "#F5F5F5",
+              }}
+            >
+              请 进
+            </button>
+            <p className="text-[#A0A0A0] text-xs mt-6 tracking-[0.3em]">
+              你的 <span style={{ color: selectedDrink.color }}>{selectedDrink.name}</span> 已备好
+            </p>
+          </FadeIn>
         </div>
       )}
 
@@ -279,93 +296,77 @@ export default function HomePage() {
           }}
         >
           <div className="text-center">
-            <p className="text-accent-wine text-lg tracking-widest animate-pulse">
-              正在入座...
-            </p>
+            <GlowText color="#8B2942">
+              <p className="text-lg tracking-[0.3em] animate-pulse-subtle">
+                正在入座...
+              </p>
+            </GlowText>
           </div>
         </div>
       )}
+
+      {/* Navigation link */}
+      <div className="fixed top-6 right-6 z-50">
+        <a
+          href="/drinks"
+          className="text-[#A0A0A0] hover:text-[#D4A574] transition-colors duration-300 text-sm tracking-wider"
+        >
+          全部酒款 →
+        </a>
+      </div>
 
       <style jsx global>{`
         @keyframes char-appear {
           from {
             opacity: 0;
-            transform: translateY(20px) rotateX(-90deg);
+            transform: translateY(30px) scaleY(0);
           }
           to {
             opacity: 1;
-            transform: translateY(0) rotateX(0);
+            transform: translateY(0) scaleY(1);
           }
         }
 
-        @keyframes welcome-in {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
+        @keyframes pulse-slow {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
         }
 
-        @keyframes content-in {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        @keyframes fade-to-black {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
 
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes float-particle {
+        @keyframes particle {
           0%, 100% {
-            transform: translateY(0) translateX(0);
-            opacity: 0.2;
+            transform: translate(0, 0);
+            opacity: 0.3;
+          }
+          25% {
+            transform: translate(20px, -30px);
+            opacity: 0.6;
           }
           50% {
-            transform: translateY(-30px) translateX(10px);
+            transform: translate(-10px, -50px);
+            opacity: 0.4;
+          }
+          75% {
+            transform: translate(30px, -20px);
             opacity: 0.5;
           }
         }
 
-        @keyframes fade-to-black {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
         .animate-char-in {
-          animation: char-appear 0.6s ease forwards;
+          animation: char-appear 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           opacity: 0;
         }
 
-        .animate-welcome-in {
-          animation: welcome-in 1s ease forwards;
+        .animate-pulse-slow {
+          animation: pulse-slow 2s ease-in-out infinite;
         }
 
-        .animate-content-in {
-          animation: content-in 0.6s ease forwards;
-        }
-
-        .animate-float-particle {
-          animation: float-particle 5s ease-in-out infinite;
+        .animate-particle {
+          animation: particle 8s ease-in-out infinite;
         }
       `}</style>
     </div>
